@@ -9,7 +9,7 @@ class MobileScreenLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       backgroundColor: mobileBackgroundColor,
-      body : Center(child: Text("MOBILE")),
+      body : Center(child: Text("MOBILE" ,style: TextStyle(color: Colors.yellow),)),
     );
   }
 }

@@ -4,6 +4,9 @@ import 'package:instagram_flutter/firebase_options.dart';
 import 'package:instagram_flutter/responsive/mobilescreenlayout.dart';
 import 'package:instagram_flutter/responsive/responsive_layout_builder.dart';
 import 'package:instagram_flutter/responsive/webscreenlayout.dart';
+import 'package:instagram_flutter/screens/OG_login_screen.dart';
+import 'package:instagram_flutter/screens/sign_up_screen.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +28,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner : false,
       
       theme: ThemeData.dark(),
-      home:const  ResponsiveLayout(webScreen:  WebScreenLayout(), mobileScreen:  MobileScreenLayout()),
+      home:const  ResponsiveLayout(webScreen:  WebScreenLayout(), mobileScreen:  SignupScreenMobile()),
     );
   }
 }
