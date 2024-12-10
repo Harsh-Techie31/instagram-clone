@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:instagram_flutter/resources/auth_methods.dart';
 import 'package:instagram_flutter/screens/sign_up_screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
+import 'package:instagram_flutter/utils/utils.dart';
 import 'package:instagram_flutter/widget/text_input_field.dart';
 
 class LoginScreenMobile extends StatefulWidget {
@@ -14,12 +16,31 @@ class LoginScreenMobile extends StatefulWidget {
 class _LoginScreenMobileState extends State<LoginScreenMobile> {
   final TextEditingController _emailTextController = TextEditingController();
   final TextEditingController _pwTextController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
     _emailTextController.dispose();
     _pwTextController.dispose();
     super.dispose();
+  }
+
+  void LoginUser()async{
+    setState(() {
+      _isLoading = true;
+    });
+    String output = await AuthMethods().loginUser(email: _emailTextController.text , password: _pwTextController.text);
+
+    if(output =="sucess"){
+      showSnackBar("Logged In Succesfully !!", context);
+      //TODO : show the home screen
+    }else{
+        showSnackBar(output, context);
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -73,9 +94,7 @@ class _LoginScreenMobileState extends State<LoginScreenMobile> {
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () {
-                      // Implement login logic here
-                    },
+                    onPressed: LoginUser,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: blueColor,
                       padding: const EdgeInsets.symmetric(
@@ -84,7 +103,7 @@ class _LoginScreenMobileState extends State<LoginScreenMobile> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: const Text(
+                    child: _isLoading ? const Center(child: CircularProgressIndicator(color: primaryColor,),): const Text(
                       "Log In",
                       style: TextStyle(
                           color: Colors.white,

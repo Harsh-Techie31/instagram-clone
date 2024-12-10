@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:instagram_flutter/resources/auth_methods.dart';
 import 'package:instagram_flutter/screens/OG_login_screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
+import 'package:instagram_flutter/utils/utils.dart';
 import 'package:instagram_flutter/widget/text_input_field.dart';
 
 class SignupScreenMobile extends StatefulWidget {
@@ -16,6 +17,7 @@ class _SignupScreenMobileState extends State<SignupScreenMobile> {
   final TextEditingController _emailTextController = TextEditingController();
   final TextEditingController _pwTextController = TextEditingController();
   final TextEditingController _idTextController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -23,6 +25,30 @@ class _SignupScreenMobileState extends State<SignupScreenMobile> {
     _pwTextController.dispose();
     _idTextController.dispose();
     super.dispose();
+  }
+
+  void SignUpUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+    String output = await AuthMethods().signUpUser(
+        email: _emailTextController.text,
+        password: _pwTextController.text,
+        username: _idTextController.text);
+
+    if (output != "sucess") {
+      showSnackBar(output, context);
+    } else {
+      showSnackBar("Signed Up Succesfully", context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreenMobile()),
+      );
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -96,14 +122,7 @@ class _SignupScreenMobileState extends State<SignupScreenMobile> {
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () async {
-                      String output = await AuthMethods().signUpUser(
-                          email: _emailTextController.text,
-                          password: _pwTextController.text,
-                          username: _idTextController.text);
-                      print(output);
-                          
-                    },
+                    onPressed: SignUpUser,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: blueColor,
                       padding: const EdgeInsets.symmetric(
@@ -112,13 +131,19 @@ class _SignupScreenMobileState extends State<SignupScreenMobile> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: const Text(
-                      "Sign Up",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
-                    ),
+                    child: _isLoading
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                              color: primaryColor,
+                            ),
+                          )
+                        : const Text(
+                            "Sign Up",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold),
+                          ),
                   ),
                   const SizedBox(
                     height: 10,
