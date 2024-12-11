@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:instagram_flutter/resources/user-models.dart';
 
-class AuthMethods{
+class AuthMethods {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -11,25 +12,26 @@ class AuthMethods{
     required String password,
     required String username,
     // required Uint8List file
-
-  }) async{
+  }) async {
     var res = "Some error occured";
 
-    try{
-      if(email.isNotEmpty && password.isNotEmpty && username.isNotEmpty){
-      UserCredential cred =  await _auth.createUserWithEmailAndPassword(email: email, password: password);
-      await _firestore.collection("users").doc(cred.user?.uid).set({
-        "email" : email,
-        "password" : password,
-        "uid" : cred.user?.uid,        
-        "username" : username,
-        "followers" : [],
-        "following" : []
-      });
+    try {
+      if (email.isNotEmpty && password.isNotEmpty && username.isNotEmpty) {
+        UserCredential cred = await _auth.createUserWithEmailAndPassword(
+            email: email, password: password);
 
-      res= "sucess";
-    }}
-    catch(err){
+        Userm hey = Userm(
+            email: email,
+            uid: cred.user!.uid,
+            username: username,
+            followers: [],
+            following: []);
+
+        await _firestore.collection("users").doc(cred.user?.uid).set(hey.toJson());
+
+        res = "sucess";
+      }
+    } catch (err) {
       res = err.toString();
     }
     return res;
@@ -39,24 +41,21 @@ class AuthMethods{
     required String email,
     required String password,
   }) async {
-      String res = "Some error occured";
+    String res = "Some error occured";
 
-      try{
-        if(email.isNotEmpty && password.isNotEmpty){
-          await _auth.signInWithEmailAndPassword(email: email, password: password);
+    try {
+      if (email.isNotEmpty && password.isNotEmpty) {
+        await _auth.signInWithEmailAndPassword(
+            email: email, password: password);
 
-          res = "sucess";
-        }else{
-          res = "Fill all the details!!";
-        }
-
-      }catch(err){
-        res = err.toString();
+        res = "sucess";
+      } else {
+        res = "Fill all the details!!";
       }
-      
+    } catch (err) {
+      res = err.toString();
+    }
 
-      return res;
+    return res;
   }
-
-
 }

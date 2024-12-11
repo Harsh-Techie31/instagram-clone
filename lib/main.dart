@@ -6,7 +6,7 @@ import 'package:instagram_flutter/responsive/mobilescreenlayout.dart';
 import 'package:instagram_flutter/responsive/responsive_layout_builder.dart';
 import 'package:instagram_flutter/responsive/webscreenlayout.dart';
 import 'package:instagram_flutter/screens/OG_login_screen.dart';
-import 'package:instagram_flutter/screens/sign_up_screen.dart';
+// import 'package:instagram_flutter/screens/sign_up_screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
 
 void main() async {
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
                 if (snapshot.hasData) {
                   return const ResponsiveLayout(
                       webScreen: WebScreenLayout(),
-                      mobileScreen: LoginScreenMobile());
+                      mobileScreen: MobileScreenLayout());
                 } else if (snapshot.hasError) {
                   return Center(child: Text(snapshot.error.toString()));
                 }

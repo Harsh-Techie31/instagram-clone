@@ -39,7 +39,7 @@ class _SignupScreenMobileState extends State<SignupScreenMobile> {
     if (output != "sucess") {
       showSnackBar(output, context);
     } else {
-      showSnackBar("Signed Up Succesfully", context);
+      showSnackBar("Signed Up Succesfully", context , Duration(seconds: 1));
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const LoginScreenMobile()),

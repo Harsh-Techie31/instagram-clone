@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:instagram_flutter/resources/auth_methods.dart';
+import 'package:instagram_flutter/responsive/mobilescreenlayout.dart';
+import 'package:instagram_flutter/responsive/responsive_layout_builder.dart';
+import 'package:instagram_flutter/responsive/webscreenlayout.dart';
 import 'package:instagram_flutter/screens/sign_up_screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
 import 'package:instagram_flutter/utils/utils.dart';
@@ -32,8 +35,13 @@ class _LoginScreenMobileState extends State<LoginScreenMobile> {
     String output = await AuthMethods().loginUser(email: _emailTextController.text , password: _pwTextController.text);
 
     if(output =="sucess"){
-      showSnackBar("Logged In Succesfully !!", context);
+      showSnackBar("Logged In Succesfully !!", context,Duration(seconds: 1));
       //TODO : show the home screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ResponsiveLayout(webScreen: WebScreenLayout(), mobileScreen: MobileScreenLayout())),
+      );
+
     }else{
         showSnackBar(output, context);
     }
