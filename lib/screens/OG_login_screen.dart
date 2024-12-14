@@ -4,6 +4,7 @@ import 'package:instagram_flutter/resources/auth_methods.dart';
 import 'package:instagram_flutter/responsive/mobilescreenlayout.dart';
 import 'package:instagram_flutter/responsive/responsive_layout_builder.dart';
 import 'package:instagram_flutter/responsive/webscreenlayout.dart';
+import 'package:instagram_flutter/screens/add-post.dart';
 import 'package:instagram_flutter/screens/sign_up_screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
 import 'package:instagram_flutter/utils/utils.dart';
@@ -40,6 +41,7 @@ class _LoginScreenMobileState extends State<LoginScreenMobile> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const ResponsiveLayout(webScreen: WebScreenLayout(), mobileScreen: MobileScreenLayout())),
+        // MaterialPageRoute(builder: (context) => const AddPost()),
       );
 
     }else{
