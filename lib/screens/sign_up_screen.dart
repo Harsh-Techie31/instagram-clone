@@ -43,42 +43,93 @@ class _SignupScreenMobileState extends State<SignupScreenMobile> {
   }
 
   // Handle image selection
-  Future<void> _selectImage(BuildContext context) async {
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return SimpleDialog(
-          title: const Text("Pick an Image"),
-          children: [
-            SimpleDialogOption(
-              onPressed: () async {
-                Navigator.pop(context);
-                final Uint8List? file = await pickImage(ImageSource.camera);
-                setState(() {
-                  _profileImage = file;
-                });
-              },
-              child: const Text("Take a Photo"),
+  _selectImage(BuildContext context) async {
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return SimpleDialog(
+        title: const Center(
+          child: Text(
+            "Pick an Image",
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        children: [
+          const Divider(height: 1, thickness: 1), // Top divider
+
+          // Option: Take a Photo
+          _buildDialogOption(
+            context,
+            label: "Take a Photo",
+            icon: Icons.camera_alt_outlined,
+            onTap: () async {
+              Navigator.pop(context);
+              Uint8List? file = await pickImage(ImageSource.camera);
+              setState(() {
+                _profileImage = file;
+              });
+            },
+          ),
+
+          const Divider(height: 1, thickness: 1), // Divider between options
+
+          // Option: Choose a Photo
+          _buildDialogOption(
+            context,
+            label: "Choose a Photo",
+            icon: Icons.photo_library_outlined,
+            onTap: () async {
+              Navigator.pop(context);
+              Uint8List? file = await pickImage(ImageSource.gallery);
+              setState(() {
+                _profileImage = file;
+              });
+            },
+          ),
+
+          const Divider(height: 1, thickness: 1), // Divider before Cancel
+
+          // Cancel Option
+          _buildDialogOption(
+            context,
+            label: "Cancel",
+            icon: Icons.close,
+            isCancel: true,
+            onTap: () => Navigator.pop(context),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Widget _buildDialogOption(BuildContext context,
+    {required String label,
+    required IconData icon,
+    required VoidCallback onTap,
+    bool isCancel = false}) {
+  return InkWell(
+    onTap: onTap,
+    child: Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+      child: Row(
+        children: [
+          Icon(icon, size: 24, color: isCancel ? Colors.red : Colors.lightBlue[600]),
+          const SizedBox(width: 16), // Space between icon and text
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: isCancel ? Colors.red : Colors.lightBlue[600],
             ),
-            SimpleDialogOption(
-              onPressed: () async {
-                Navigator.pop(context);
-                final Uint8List? file = await pickImage(ImageSource.gallery);
-                setState(() {
-                  _profileImage = file;
-                });
-              },
-              child: const Text("Choose from Gallery"),
-            ),
-            SimpleDialogOption(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
-            ),
-          ],
-        );
-      },
-    );
-  }
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
   // Sign up user
   void _signUpUser() async {
