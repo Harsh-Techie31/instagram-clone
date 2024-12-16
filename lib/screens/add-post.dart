@@ -91,7 +91,7 @@ class _AddPostState extends State<AddPost> {
           postUrl: await getImageUrl(path2),
           pfpLink: await getImageUrl(path3),
           uid: user!.uid,
-          time: DateFormat('yyyy-MM-dd – kk:mm').format(now),
+          time: DateFormat('yyyy-MM-dd').format(now),
           likes: []);
       if (res != "success") {
         showSnackBar(res, context);

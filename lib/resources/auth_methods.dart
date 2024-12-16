@@ -91,20 +91,20 @@ class AuthMethods {
           time: time,
           likes: likes,
         );
-        print("REACHED BEFORE THE FIRESTORE CALL");
+        // print("REACHED BEFORE THE FIRESTORE CALL");
         await _firestore
             .collection("posts") // Main collection
-            .doc(uid) // Document under "posts" named as uid
-            .collection("user-posts") // Subcollection inside the uid document
-            .doc(postId) // Document under "user_posts" with postId as the ID
+            .doc(postId) // Document under "posts" named as uid
+            // .collection("user-posts") // Subcollection inside the uid document
+            // .doc(postId) // Document under "user_posts" with postId as the ID
             .set(post.toJson()); // Save the data
-        print("REACHED BEFORE THE FIRESTORE CALL2222");
+        // print("REACHED BEFORE THE FIRESTORE CALL2222");
         res = "success";
       }else{
-        print("REACHED BEFORE THE FIRESTORE CALLCHIRTSMAS");
+        // print("REACHED BEFORE THE FIRESTORE CALLCHIRTSMAS");
       }
     } catch (err) {
-      print("REACHED BEFORE THE FIRESTORE CALL3333");
+      // print("REACHED BEFORE THE FIRESTORE CALL3333");
       res = err.toString();
     }
     return res;
