@@ -7,7 +7,7 @@ import 'package:instagram_flutter/responsive/mobilescreenlayout.dart';
 import 'package:instagram_flutter/responsive/responsive_layout_builder.dart';
 import 'package:instagram_flutter/responsive/webscreenlayout.dart';
 import 'package:instagram_flutter/screens/OG_login_screen.dart';
-import 'package:instagram_flutter/screens/add-post.dart';
+// import 'package:instagram_flutter/screens/add-post.dart';
 // import 'package:instagram_flutter/screens/sign_up_screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
 import 'package:provider/provider.dart';
