@@ -1,5 +1,6 @@
 import 'dart:isolate';
 import 'dart:typed_data';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -47,7 +48,6 @@ class _AddPostState extends State<AddPost> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _controller.dispose();
   }
@@ -81,12 +81,12 @@ class _AddPostState extends State<AddPost> {
       await Supabase.instance.client.storage
           .from('user-images')
           .uploadBinary(path, _file!);
-      
-      print("username : ${user!.username} , postid is : ${temp} and desc : ${_controller.text}");
+
+      // print("username : ${user!.username} , postid is : ${temp} and desc : ${_controller.text}");
 
       String res = await AuthMethods().uploadImg(
           username: user!.username,
-          description: _controller.text.isNotEmpty ?  _controller.text : " ",
+          description: _controller.text.isNotEmpty ? _controller.text : " ",
           postId: temp,
           postUrl: await getImageUrl(path2),
           pfpLink: await getImageUrl(path3),
@@ -118,93 +118,95 @@ class _AddPostState extends State<AddPost> {
     }
   }
 
- _selectImage(BuildContext context) async {
-  return showDialog(
-    context: context,
-    builder: (context) {
-      return SimpleDialog(
-        title: const Center(
-          child: Text(
-            "Pick an Image",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        children: [
-          const Divider(height: 1, thickness: 1), // Top divider
-
-          // Option: Take a Photo
-          _buildDialogOption(
-            context,
-            label: "Take a Photo",
-            icon: Icons.camera_alt_outlined,
-            onTap: () async {
-              Navigator.pop(context);
-              Uint8List? file = await pickImage(ImageSource.camera);
-              setState(() {
-                _file = file;
-              });
-            },
-          ),
-
-          const Divider(height: 1, thickness: 1), // Divider between options
-
-          // Option: Choose a Photo
-          _buildDialogOption(
-            context,
-            label: "Choose a Photo",
-            icon: Icons.photo_library_outlined,
-            onTap: () async {
-              Navigator.pop(context);
-              Uint8List? file = await pickImage(ImageSource.gallery);
-              setState(() {
-                _file = file;
-              });
-            },
-          ),
-
-          const Divider(height: 1, thickness: 1), // Divider before Cancel
-
-          // Cancel Option
-          _buildDialogOption(
-            context,
-            label: "Cancel",
-            icon: Icons.close,
-            isCancel: true,
-            onTap: () => Navigator.pop(context),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-Widget _buildDialogOption(BuildContext context,
-    {required String label,
-    required IconData icon,
-    required VoidCallback onTap,
-    bool isCancel = false}) {
-  return InkWell(
-    onTap: onTap,
-    child: Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-      child: Row(
-        children: [
-          Icon(icon, size: 24, color: isCancel ? Colors.red : Colors.lightBlue[600]),
-          const SizedBox(width: 16), // Space between icon and text
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-              color: isCancel ? Colors.red : Colors.lightBlue[600],
+  _selectImage(BuildContext context) async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          title: const Center(
+            child: Text(
+              "Pick an Image",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ),
-        ],
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          children: [
+            const Divider(height: 1, thickness: 1), // Top divider
+
+            // Option: Take a Photo
+            _buildDialogOption(
+              context,
+              label: "Take a Photo",
+              icon: Icons.camera_alt_outlined,
+              onTap: () async {
+                Navigator.pop(context);
+                Uint8List? file = await pickImage(ImageSource.camera);
+                setState(() {
+                  _file = file;
+                });
+              },
+            ),
+
+            const Divider(height: 1, thickness: 1), // Divider between options
+
+            // Option: Choose a Photo
+            _buildDialogOption(
+              context,
+              label: "Choose a Photo",
+              icon: Icons.photo_library_outlined,
+              onTap: () async {
+                Navigator.pop(context);
+                Uint8List? file = await pickImage(ImageSource.gallery);
+                setState(() {
+                  _file = file;
+                });
+              },
+            ),
+
+            const Divider(height: 1, thickness: 1), // Divider before Cancel
+
+            // Cancel Option
+            _buildDialogOption(
+              context,
+              label: "Cancel",
+              icon: Icons.close,
+              isCancel: true,
+              onTap: () => Navigator.pop(context),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildDialogOption(BuildContext context,
+      {required String label,
+      required IconData icon,
+      required VoidCallback onTap,
+      bool isCancel = false}) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+        child: Row(
+          children: [
+            Icon(icon,
+                size: 24, color: isCancel ? Colors.red : Colors.lightBlue[600]),
+            const SizedBox(width: 16), // Space between icon and text
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: isCancel ? Colors.red : Colors.lightBlue[600],
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Future<String> getImageUrl(String imagePath) async {
     try {
@@ -283,8 +285,7 @@ Widget _buildDialogOption(BuildContext context,
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return const CircleAvatar(
-                            radius: 30,
+                          return const Center(
                             child: CircularProgressIndicator(),
                           ); // Show loading indicator while fetching
                         }
@@ -296,16 +297,16 @@ Widget _buildDialogOption(BuildContext context,
                           ); // Show error icon if there's an error
                         }
 
-                        final imageUrl = snapshot.data!;
+                        final imageUrL = snapshot.data!;
                         return CircleAvatar(
-                          backgroundImage: NetworkImage(imageUrl),
+                          backgroundImage: CachedNetworkImageProvider(imageUrL),
                           radius: 30,
                         );
                       },
                     ),
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.5,
-                      child:  TextField(
+                      child: TextField(
                         controller: _controller,
                         maxLines: 5,
                         decoration: const InputDecoration(

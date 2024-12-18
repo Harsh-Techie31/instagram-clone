@@ -100,7 +100,7 @@ class AuthMethods {
             .set(post.toJson()); // Save the data
         // print("REACHED BEFORE THE FIRESTORE CALL2222");
         res = "success";
-      }else{
+      } else {
         // print("REACHED BEFORE THE FIRESTORE CALLCHIRTSMAS");
       }
     } catch (err) {
@@ -131,4 +131,30 @@ class AuthMethods {
 
     return res;
   }
+
+  Future<void> likePost(String postId, String uid, List likes) async {
+  // String res = "Some error occurred"; // Default error message
+
+  try {
+    // Check if the user has already liked the post
+    if (likes.contains(uid)) {
+      // Remove the like if already liked
+      await _firestore.collection('posts').doc(postId).update({
+        'likes': FieldValue.arrayRemove([uid])
+      });
+    } else {
+      // Add the like if not already liked
+      await _firestore.collection('posts').doc(postId).update({
+        'likes': FieldValue.arrayUnion([uid])
+      });
+    }
+    // res = "Success"; // Update response for successful operation
+  } catch (err) {
+    // Catch and store the error
+    // res = "Error: ${err.toString()}";
+    print("ERROR FROM LIKE-POST FXN : ${err.toString()}");
+  }
+
+  // return res; // Return the response
+}
 }

@@ -47,6 +47,8 @@ dependencies:
   uuid: ^4.5.1
   intl: ^0.20.1
   cached_network_image: ^3.3.0
+  flutter_launcher_icons: ^0.13.1
+  like_button: ^2.0.5
 
 dev_dependencies:
   flutter_test:
@@ -63,6 +65,10 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+flutter_icons:
+  android: true  # Enable Android icons
+  ios: true      # Enable iOS icons
+  image_path: "assets/playstore.png" 
 flutter:
 
   # The following line ensures that the Material Icons font is

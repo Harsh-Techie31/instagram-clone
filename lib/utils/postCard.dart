@@ -1,52 +1,101 @@
 import 'package:flutter/material.dart';
+import 'package:instagram_flutter/resources/auth_methods.dart';
 import 'package:instagram_flutter/utils/colors.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:cached_network_image/cached_network_image.dart';
 
-class PostsCard extends StatelessWidget {
+class PostsCard extends StatefulWidget {
   final snap;
   const PostsCard({super.key, required this.snap});
-  // const PostsCard({super.key});
+
+  @override
+  State<PostsCard> createState() => _PostsCardState();
+}
+
+class _PostsCardState extends State<PostsCard>
+    with SingleTickerProviderStateMixin {
+
+
+  
+  bool _isLiked = false;
+  bool _showHeart = false;
+  late AnimationController _animationController;
+  AuthMethods _authMethods = AuthMethods();
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void updateLikes()async{
+    await _authMethods.likePost(
+      widget.snap['postId'],
+      widget.snap['uid'],
+      widget.snap['likes'],
+    );
+  }
+
+  void _handleDoubleTap()  {    
+  
+     updateLikes();
+    
+    
+    
+    setState(() {
+      _isLiked = !_isLiked;
+      _showHeart = true;
+    });
+
+    _animationController.forward().then((value) {
+      _animationController.reverse().then((_) {
+        setState(() {
+          _showHeart = false;
+        });
+      });
+    });
+
+    // print("Leaving double tap");
+  }
 
   @override
   Widget build(BuildContext context) {
+    _isLiked = widget.snap['likes'].contains(widget.snap['uid']);
     return Card(
+
+      
       color: mobileBackgroundColor,
       elevation: 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
-      // child: Container(
-      // padding:
-      //     const EdgeInsets.only(left: 20, right: 20, bottom: 120, top: 120),
-
-      // Add a nested container for border
-      // decoration: BoxDecoration(
-      //   border: Border.all(
-      //     color: Colors.yellow, // Border color
-      //     width: 2, // Border thickness
-      //   ),
-      //   borderRadius:
-      //       BorderRadius.circular(10), // Rounded corners for the border
-      // ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // // SizedBox(height: 100),
           Row(
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 8, top: 8),
                 child: CircleAvatar(
-                  backgroundImage: CachedNetworkImageProvider(snap['pfpLink']),
+                  backgroundImage:
+                      CachedNetworkImageProvider(widget.snap['pfpLink']),
                 ),
               ),
-              const SizedBox(width: 10), // Space beside the avatar
+              const SizedBox(width: 10),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(top: 14.0),
                   child: Text(
-                    "  ${snap['username']}",
+                    "  ${widget.snap['username']}",
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -55,60 +104,82 @@ class PostsCard extends StatelessWidget {
                 ),
               ),
               IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.more_vert,
-                    size: 28,
-                    color: Colors.white,
-                  ))
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.more_vert,
+                  size: 28,
+                  color: Colors.white,
+                ),
+              ),
             ],
           ),
-          // const Divider(),
           Container(
             padding: const EdgeInsets.only(top: 10, right: 10, left: 10),
-            // height: 250, // Fixed height for the image
-            width: double.infinity, // Full width of the card
-            // decoration: BoxDecoration(
-            //   borderRadius: BorderRadius.circular(10),
-            // ),
-            child: AspectRatio(
-              aspectRatio: 4 / 3,
-              child: CachedNetworkImage(
-                imageUrl: snap['postUrl'], // The image URL from Supabase
-                fit: BoxFit.cover, // Cover the entire container
-                placeholder: (context, url) => const Center(
-                    child: CircularProgressIndicator()), // Loading spinner
-                errorWidget: (context, url, error) => const Icon(Icons
-                    .error), // Display error icon if the image fails to load
+            width: double.infinity,
+            child: GestureDetector(
+              onDoubleTap: _handleDoubleTap,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  CachedNetworkImage(
+                    imageUrl: widget.snap['postUrl'],
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                  ),
+                  if (_showHeart)
+                    ScaleTransition(
+                      scale: Tween<double>(begin: 1.0, end: 1.5).animate(
+                        CurvedAnimation(
+                          parent: _animationController,
+                          curve: Curves.easeOut,
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.favorite,
+                        // color: Color(0xFFED4956),
+                        color: Color(0xFFFF3040),
+                        size: 100,
+                      ),
+                    ),
+                ],
               ),
-              // fit: BoxFit.cover, // Cover the entire container
             ),
           ),
-
           Row(
             children: [
               IconButton(
-                  padding: const EdgeInsets.all(0),
-                  onPressed: () {},
-                  icon: const Icon(Icons.favorite_border_outlined)),
+                onPressed: () {
+                  setState(() {
+                    _isLiked = !_isLiked;
+                    updateLikes();
+                  });
+                },
+                icon: Icon(
+                  _isLiked ? Icons.favorite : Icons.favorite_border_outlined,
+                  color: _isLiked ? const Color(0xFFFF3040) : Colors.white,
+                ),
+              ),
               IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.insert_comment_outlined)),
+                onPressed: () {},
+                icon: const Icon(Icons.insert_comment_outlined),
+              ),
               IconButton(onPressed: () {}, icon: const Icon(Icons.send)),
               const Spacer(),
               IconButton(
-                  padding: const EdgeInsets.all(0),
-                  onPressed: () {},
-                  icon: const Icon(Icons.bookmark_outline_outlined)),
+                onPressed: () {},
+                icon: const Icon(Icons.bookmark_outline_outlined),
+              ),
             ],
           ),
           Align(
-            alignment: Alignment.centerLeft, // Align text to the left
+            alignment: Alignment.centerLeft,
             child: Padding(
-              padding: const EdgeInsets.only(
-                  left: 12.0), // Optional padding for spacing
+              padding: const EdgeInsets.only(left: 12.0),
               child: Text(
-                "${snap['likes'].length} likes",
+                "${widget.snap['likes'].length} likes",
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -118,28 +189,25 @@ class PostsCard extends StatelessWidget {
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
-            textDirection: TextDirection.ltr,
-            // mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 14.0),
                 child: Text(
-                  "${snap['username']}",
+                  "${widget.snap['username']}",
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w700),
                 ),
               ),
               Text(
-                "  ${snap['description']}",
+                "  ${widget.snap['description']}",
                 style: const TextStyle(fontSize: 14),
               ),
             ],
           ),
           const Align(
-            alignment: Alignment.centerLeft, // Align text to the left
+            alignment: Alignment.centerLeft,
             child: Padding(
-              padding:
-                  EdgeInsets.only(left: 14.0), // Optional padding for spacing
+              padding: EdgeInsets.only(left: 14.0),
               child: Text(
                 "View all 200 Comments",
                 style: TextStyle(
@@ -151,13 +219,12 @@ class PostsCard extends StatelessWidget {
             ),
           ),
           Align(
-            alignment: Alignment.centerLeft, // Align text to the left
+            alignment: Alignment.centerLeft,
             child: Padding(
-              padding: const EdgeInsets.only(
-                  left: 14.0), // Optional padding for spacing
+              padding: const EdgeInsets.only(left: 14.0),
               child: Text(
                 intl.DateFormat("MMM dd, yyyy")
-                    .format(DateTime.parse(snap['time'])),
+                    .format(DateTime.parse(widget.snap['time'])),
                 style: const TextStyle(
                   color: Colors.grey,
                   fontSize: 14,
@@ -166,13 +233,9 @@ class PostsCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(
-            height: 20,
-          )
+          const SizedBox(height: 20),
         ],
       ),
-
-      // ),
     );
   }
 }
