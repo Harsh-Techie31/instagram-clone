@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:instagram_flutter/models/user-models.dart';
+import 'package:instagram_flutter/providers/user-provider.dart';
 import 'package:instagram_flutter/resources/auth_methods.dart';
+import 'package:instagram_flutter/screens/comment-screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:provider/provider.dart';
 
 class PostsCard extends StatefulWidget {
   final snap;
@@ -14,9 +18,6 @@ class PostsCard extends StatefulWidget {
 
 class _PostsCardState extends State<PostsCard>
     with SingleTickerProviderStateMixin {
-
-
-  
   bool _isLiked = false;
   bool _showHeart = false;
   late AnimationController _animationController;
@@ -37,20 +38,17 @@ class _PostsCardState extends State<PostsCard>
     super.dispose();
   }
 
-  void updateLikes()async{
+  void updateLikes(Userm user) async {
     await _authMethods.likePost(
       widget.snap['postId'],
-      widget.snap['uid'],
+      user.uid,
       widget.snap['likes'],
     );
   }
 
-  void _handleDoubleTap()  {    
-  
-     updateLikes();
-    
-    
-    
+  void _handleDoubleTap(Userm user) {
+    updateLikes(user);
+
     setState(() {
       _isLiked = !_isLiked;
       _showHeart = true;
@@ -69,10 +67,25 @@ class _PostsCardState extends State<PostsCard>
 
   @override
   Widget build(BuildContext context) {
-    _isLiked = widget.snap['likes'].contains(widget.snap['uid']);
-    return Card(
+    final Userm? _user =
+        Provider.of<UserProvider>(context, listen: false).getUser;
+    if (_user != null) {
+      print("USER uis : ${_user.uid}");
+    }
+    _isLiked = widget.snap['likes'].contains(_user!.uid);
+    int commentCount = widget.snap['comments'].length;
+    String getCommentText(int count) {
+      switch (count) {
+        case 0:
+          return "No comments yet";
+        case 1:
+          return "View 1 Comment";
+        default :
+        return "View all $count Comments";
+      }
+    }
 
-      
+    return Card(
       color: mobileBackgroundColor,
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -117,7 +130,9 @@ class _PostsCardState extends State<PostsCard>
             padding: const EdgeInsets.only(top: 10, right: 10, left: 10),
             width: double.infinity,
             child: GestureDetector(
-              onDoubleTap: _handleDoubleTap,
+              onDoubleTap: () {
+                _handleDoubleTap(_user);
+              },
               child: Stack(
                 alignment: Alignment.center,
                 children: [
@@ -154,7 +169,7 @@ class _PostsCardState extends State<PostsCard>
                 onPressed: () {
                   setState(() {
                     _isLiked = !_isLiked;
-                    updateLikes();
+                    updateLikes(_user);
                   });
                 },
                 icon: Icon(
@@ -163,7 +178,13 @@ class _PostsCardState extends State<PostsCard>
                 ),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CommentScreen(
+                              user: _user, postID: widget.snap['postId'])));
+                },
                 icon: const Icon(Icons.insert_comment_outlined),
               ),
               IconButton(onPressed: () {}, icon: const Icon(Icons.send)),
@@ -204,13 +225,14 @@ class _PostsCardState extends State<PostsCard>
               ),
             ],
           ),
-          const Align(
+          Align(
             alignment: Alignment.centerLeft,
             child: Padding(
-              padding: EdgeInsets.only(left: 14.0),
+              padding: const EdgeInsets.only(left: 14.0),
               child: Text(
-                "View all 200 Comments",
-                style: TextStyle(
+                // "View all $commentCount Comments",
+                getCommentText(commentCount),
+                style: const TextStyle(
                   color: Colors.grey,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,

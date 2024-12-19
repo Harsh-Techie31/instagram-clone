@@ -67,6 +67,7 @@ class AuthMethods {
     required String uid,
     required String time,
     required List likes,
+    required List comments,
   }) async {
     var res = "Some error occured1111";
     print("REACHED BEFORE THE FIRESTORE CALL00000");
@@ -90,6 +91,7 @@ class AuthMethods {
           uid: uid,
           time: time,
           likes: likes,
+          comments: comments,
         );
         // print("REACHED BEFORE THE FIRESTORE CALL");
         await _firestore

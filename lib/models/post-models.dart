@@ -9,6 +9,7 @@ class Postm {
   final String uid;
   final String time;
   final List likes;
+  final List comments;
 
   const Postm({
     required this.username,
@@ -19,6 +20,7 @@ class Postm {
     required this.uid,
     required this.time,
     required this.likes,
+    required this.comments,
   });
 
   // Convert Postm object to JSON (Map)
@@ -31,6 +33,7 @@ class Postm {
         "uid": uid,
         "time": time,
         "likes": likes,
+        "comments": comments,
       };
 
   // Convert DocumentSnapshot to Postm object
@@ -46,6 +49,7 @@ class Postm {
       uid: snapshot['uid'] ?? '',                   // Default to empty string
       time: snapshot['time'] ?? '',                 // Default to empty string
       likes: snapshot['likes'] ?? [],               // Default to empty list
+      comments: snapshot['comments'] ?? [],               // Default to empty list
     );
   }
 }

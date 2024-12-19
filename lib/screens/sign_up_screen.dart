@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 // import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram_flutter/resources/auth_methods.dart';
+import 'package:instagram_flutter/responsive/mobilescreenlayout.dart';
+import 'package:instagram_flutter/responsive/responsive_layout_builder.dart';
+import 'package:instagram_flutter/responsive/webscreenlayout.dart';
 import 'package:instagram_flutter/screens/OG_login_screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
 import 'package:instagram_flutter/utils/utils.dart';
@@ -153,7 +156,7 @@ Widget _buildDialogOption(BuildContext context,
       showSnackBar("Signed Up Successfully", context, Duration(seconds: 1));
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const LoginScreenMobile()),
+        MaterialPageRoute(builder: (context) => const ResponsiveLayout(webScreen: WebScreenLayout(),mobileScreen: MobileScreenLayout(),)),
       );
     }
 
