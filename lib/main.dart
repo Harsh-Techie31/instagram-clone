@@ -7,6 +7,7 @@ import 'package:instagram_flutter/responsive/mobilescreenlayout.dart';
 import 'package:instagram_flutter/responsive/responsive_layout_builder.dart';
 import 'package:instagram_flutter/responsive/webscreenlayout.dart';
 import 'package:instagram_flutter/screens/OG_login_screen.dart';
+import 'package:instagram_flutter/screens/explore.dart';
 // import 'package:instagram_flutter/screens/add-post.dart';
 // import 'package:instagram_flutter/screens/sign_up_screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
@@ -52,6 +53,7 @@ class MyApp extends StatelessWidget {
                     return const ResponsiveLayout(
                         webScreen: WebScreenLayout(),
                         mobileScreen:
+                            // ExplorePage()); //TODO: change it to mobile screen later
                             MobileScreenLayout()); //TODO: change it to mobile screen later
                   } else if (snapshot.hasError) {
                     return Center(child: Text(snapshot.error.toString()));

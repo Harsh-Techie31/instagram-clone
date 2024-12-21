@@ -1,4 +1,4 @@
-import 'dart:isolate';
+// import 'dart:isolate';
 import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,6 +9,7 @@ import 'package:instagram_flutter/providers/user-provider.dart';
 import 'package:instagram_flutter/resources/auth_methods.dart';
 import 'package:instagram_flutter/screens/OG_login_screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
+import 'package:instagram_flutter/utils/compressor.dart';
 import 'package:instagram_flutter/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -48,8 +49,8 @@ class _AddPostState extends State<AddPost> {
 
   @override
   void dispose() {
-    super.dispose();
     _controller.dispose();
+    super.dispose();    
   }
 
   void logout() async {
@@ -143,8 +144,9 @@ class _AddPostState extends State<AddPost> {
               onTap: () async {
                 Navigator.pop(context);
                 Uint8List? file = await pickImage(ImageSource.camera);
+                Uint8List finalFile = await compressImageToBelow2MB(file!);
                 setState(() {
-                  _file = file;
+                  _file = finalFile;
                 });
               },
             ),
@@ -159,8 +161,9 @@ class _AddPostState extends State<AddPost> {
               onTap: () async {
                 Navigator.pop(context);
                 Uint8List? file = await pickImage(ImageSource.gallery);
+                Uint8List finalFile2 = await compressImageToBelow2MB(file!);
                 setState(() {
-                  _file = file;
+                  _file = finalFile2;
                 });
               },
             ),

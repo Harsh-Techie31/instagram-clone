@@ -4,6 +4,7 @@ class Userm {
   final String email;
   final String uid;
   final String username;
+  final String pfpLink;
   final List followers;
   final List following;
 
@@ -11,12 +12,14 @@ class Userm {
     required this.email,
     required this.uid,
     required this.username,
+    required this.pfpLink,
     required this.followers,
     required this.following,
   });
 
   Map<String, dynamic> toJson() => {
         "username": username,
+        "pfpLink": pfpLink,
         "uid": uid,
         "email": email,
         "followers": followers,
@@ -30,6 +33,7 @@ class Userm {
     email: snapshot['email'] ?? '',  // Default to an empty string if 'email' is null
     uid: snapshot['uid'] ?? '',      // Default to an empty string if 'uid' is null
     username: snapshot['username'] ?? '', // Default to an empty string if 'username' is null
+    pfpLink: snapshot['pfpLink'] ?? '', // Default to an empty string if 'username' is null
     followers: snapshot['followers'] ?? [], // Default to an empty list if 'followers' is null
     following: snapshot['following'] ?? [], // Default to an empty list if 'following' is null
   );

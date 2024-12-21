@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 // import 'package:instagram_flutter/providers/user-provider.dart';
 import 'package:instagram_flutter/screens/OG_login_screen.dart';
 import 'package:instagram_flutter/screens/add-post.dart';
+import 'package:instagram_flutter/screens/explore.dart';
 import 'package:instagram_flutter/screens/feed_screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
 import 'package:instagram_flutter/utils/postCard.dart';
@@ -72,12 +73,12 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
         controller: pageController,
         onPageChanged: pageChanged,
         physics: const NeverScrollableScrollPhysics(),
-        children: const [
-          FeedScreen(),
-          Text("Search"),
-          AddPost(),
-          Text("notifcations"),
-          Text("profile"),
+        children:  [
+          const FeedScreen(),
+          ExplorePage(),
+          const AddPost(),
+          const Text("notifcations"),
+          const Text("profile"),
         ],
       ),
       bottomNavigationBar: CupertinoTabBar(

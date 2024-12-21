@@ -8,6 +8,7 @@ import 'package:instagram_flutter/responsive/responsive_layout_builder.dart';
 import 'package:instagram_flutter/responsive/webscreenlayout.dart';
 import 'package:instagram_flutter/screens/OG_login_screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
+import 'package:instagram_flutter/utils/compressor.dart';
 import 'package:instagram_flutter/utils/utils.dart';
 import 'package:instagram_flutter/widget/text_input_field.dart';
 import 'package:http/http.dart' as http;
@@ -69,8 +70,9 @@ class _SignupScreenMobileState extends State<SignupScreenMobile> {
             onTap: () async {
               Navigator.pop(context);
               Uint8List? file = await pickImage(ImageSource.camera);
+              Uint8List finalFile1 = await compressImageToBelow2MB(file!);
               setState(() {
-                _profileImage = file;
+                _profileImage = finalFile1;
               });
             },
           ),
@@ -85,8 +87,9 @@ class _SignupScreenMobileState extends State<SignupScreenMobile> {
             onTap: () async {
               Navigator.pop(context);
               Uint8List? file = await pickImage(ImageSource.gallery);
+              Uint8List finalFile2 = await compressImageToBelow2MB(file!);
               setState(() {
-                _profileImage = file;
+                _profileImage = finalFile2;
               });
             },
           ),

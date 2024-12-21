@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:instagram_flutter/models/post-models.dart';
 import 'package:instagram_flutter/models/user-models.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as sup;
+// import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthMethods {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -38,10 +39,15 @@ class AuthMethods {
             .from('user-images')
             .uploadBinary(path, file);
 
+        String pfp_link= sup.Supabase.instance.client.storage
+          .from('user-images')
+          .getPublicUrl(path);
+
         Userm hey = Userm(
             email: email,
             uid: cred.user!.uid,
             username: username,
+            pfpLink: pfp_link ,
             followers: [],
             following: []);
 
