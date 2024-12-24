@@ -1,45 +1,62 @@
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
 
-/// Compress image to below 2MB in a background isolate
-Future<Uint8List> compressImageToBelow2MB(Uint8List imageBytes) async {
+Future<Uint8List> compress1Image(Uint8List imageBytes) async {
   return await compute(_compressImage, imageBytes);
 }
 
-/// Compression logic runs in a background thread
 Uint8List _compressImage(Uint8List imageBytes) {
-  const int maxSizeInBytes = 500 * 1024; 
-
-  // Decode the image to get its original format
+  const int maxWidth = 1024; // Maximum width for image (adjust as needed)
+  const int maxHeight = 1024; // Maximum height for image (adjust as needed)
+  const int minQuality = 60; // Minimum quality for compression
+  const int maxQuality = 85; // Maximum quality for compression
+  
+  // Decode the image
   img.Image? originalImage = img.decodeImage(imageBytes);
   if (originalImage == null) {
     throw Exception("Failed to decode the image.");
   }
 
-  int low = 10;   // Minimum quality
-  int high = 100; // Maximum quality
+  print("Original image size: ${imageBytes.lengthInBytes} bytes");
+  
+  // Resize if the image is too large
+  if (originalImage.width > maxWidth || originalImage.height > maxHeight) {
+    print("Resizing image...");
+    originalImage = img.copyResize(originalImage, width: maxWidth, height: maxHeight);
+  }
+
+  // Try different qualities (binary search approach for a more flexible strategy)
+  int low = minQuality;
+  int high = maxQuality;
   Uint8List? bestCompressed;
 
   while (low <= high) {
     int mid = (low + high) ~/ 2;
+    print("Trying quality: $mid...");
 
-    // Compress the image with the current quality
+    // Compress the image
     Uint8List compressedBytes = Uint8List.fromList(
       img.encodeJpg(originalImage, quality: mid),
     );
 
-    // Check the size of the compressed image
-    if (compressedBytes.lengthInBytes <= maxSizeInBytes) {
+    print("Compressed image at quality $mid: ${compressedBytes.lengthInBytes} bytes");
+
+    // Check if the image is small enough
+    if (compressedBytes.lengthInBytes <= 600 * 1024) { // Allow max size of 600KB
       bestCompressed = compressedBytes;
       high = mid - 1; // Try for a smaller size
+      print("Compression successful, trying smaller quality.");
     } else {
-      low = mid + 1; // Increase quality to reduce compression
+      low = mid + 1; // Increase quality for a better result
+      print("Compression still too large, trying higher quality.");
     }
   }
 
   if (bestCompressed == null) {
-    throw Exception("Unable to compress image below 2MB.");
+    throw Exception("Unable to compress image to an acceptable size.");
   }
 
+  print("Final compressed image size: ${bestCompressed.lengthInBytes} bytes");
   return bestCompressed;
 }

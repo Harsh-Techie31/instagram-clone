@@ -70,9 +70,9 @@ class _SignupScreenMobileState extends State<SignupScreenMobile> {
             onTap: () async {
               Navigator.pop(context);
               Uint8List? file = await pickImage(ImageSource.camera);
-              Uint8List finalFile1 = await compressImageToBelow2MB(file!);
+              // Uint8List finalFile1 = await compressImage(file!);
               setState(() {
-                _profileImage = finalFile1;
+                _profileImage = file;
               });
             },
           ),
@@ -87,9 +87,9 @@ class _SignupScreenMobileState extends State<SignupScreenMobile> {
             onTap: () async {
               Navigator.pop(context);
               Uint8List? file = await pickImage(ImageSource.gallery);
-              Uint8List finalFile2 = await compressImageToBelow2MB(file!);
+              // Uint8List finalFile2 = await compressImage(file!);
               setState(() {
-                _profileImage = finalFile2;
+                _profileImage = file;
               });
             },
           ),

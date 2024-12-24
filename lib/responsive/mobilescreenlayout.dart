@@ -65,7 +65,6 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
           const FeedScreen(),
           const ExplorePage(),
           const  AddPost(),
-          const  Text("notifcations"),
            ProfilePage(uid : FirebaseAuth.instance.currentUser!.uid),
           //  ProfilePage(uid : "QEM4NF8ByYbEbi8nhZwdjExxPLP2"),
         ],
@@ -94,17 +93,11 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
               ),
               label: '',
               backgroundColor: primaryColor),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.favorite,
-                color: _page == 3 ? primaryColor : secondaryColor,
-              ),
-              label: '',
-              backgroundColor: primaryColor),
+
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.person,
-                color: _page == 4 ? primaryColor : secondaryColor,
+                color: _page == 3 ? primaryColor : secondaryColor,
               ),
               label: '',
               backgroundColor: primaryColor),

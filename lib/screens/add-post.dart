@@ -1,4 +1,3 @@
-// import 'dart:isolate';
 import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -27,6 +26,7 @@ class _AddPostState extends State<AddPost> {
   Uint8List? _file;
   Userm? user;
   bool _isLoading = false;
+  bool _isCompressing = false; // Flag to track image compression status
   var uuid = const Uuid();
   TextEditingController _controller = TextEditingController();
 
@@ -39,7 +39,6 @@ class _AddPostState extends State<AddPost> {
       setState(() {
         try {
           user = Provider.of<UserProvider>(context, listen: false).getUser;
-          // print(user!.username);
         } catch (err) {
           // print(err.toString());
         }
@@ -50,26 +49,12 @@ class _AddPostState extends State<AddPost> {
   @override
   void dispose() {
     _controller.dispose();
-    super.dispose();    
+    super.dispose();
   }
 
-  void logout() async {
-    FirebaseAuth _authL = FirebaseAuth.instance;
-    try {
-      await _authL.signOut();
-      showSnackBar("Logged out Succesfully", context, Duration(seconds: 1));
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginScreenMobile()),
-      );
-    } catch (err) {
-      showSnackBar(err.toString(), context);
-    }
-  }
+  
 
   uploadtoSupabase() async {
-    // print("POST BUTTON CLICKED");
     setState(() {
       _isLoading = true;
     });
@@ -78,41 +63,31 @@ class _AddPostState extends State<AddPost> {
       final path = 'post/${user!.uid}/$temp.jpeg';
       final path2 = 'post/${user!.uid}/$temp';
       final path3 = 'pfp/${user!.uid}';
-      // print("REACHED");
       await Supabase.instance.client.storage
           .from('user-images')
           .uploadBinary(path, _file!);
 
-      // print("username : ${user!.username} , postid is : ${temp} and desc : ${_controller.text}");
-
       String res = await AuthMethods().uploadImg(
-          username: user!.username,
-          description: _controller.text.isNotEmpty ? _controller.text : " ",
-          postId: temp,
-          postUrl: await getImageUrl(path2),
-          pfpLink: await getImageUrl(path3),
-          uid: user!.uid,
-          time: DateFormat('yyyy-MM-dd').format(now),
-          likes: [],
-          comments: []);
+        username: user!.username,
+        description: _controller.text.isNotEmpty ? _controller.text : " ",
+        postId: temp,
+        postUrl: await getImageUrl(path2),
+        pfpLink: await getImageUrl(path3),
+        uid: user!.uid,
+        time: DateFormat('yyyy-MM-dd').format(now),
+        likes: [],
+        comments: [],
+      );
       if (res != "success") {
         showSnackBar(res, context);
       } else {
-        showSnackBar("Posted !", context);
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => const LoginScreenMobile()),
-        // );
+        showSnackBar("Posted!", context);
         setState(() {
           _isLoading = false;
         });
         clearScreen();
       }
-
-      // ignore: use_build_context_synchronously
-      // showSnackBar("Posted !", context);
     } catch (err) {
-      // print("########## ERROR : ${err.toString()}");
       showSnackBar(err.toString(), context);
       setState(() {
         _isLoading = false;
@@ -134,7 +109,7 @@ class _AddPostState extends State<AddPost> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           children: [
-            const Divider(height: 1, thickness: 1), // Top divider
+            const Divider(height: 1, thickness: 1),
 
             // Option: Take a Photo
             _buildDialogOption(
@@ -143,32 +118,48 @@ class _AddPostState extends State<AddPost> {
               icon: Icons.camera_alt_outlined,
               onTap: () async {
                 Navigator.pop(context);
-                Uint8List? file = await pickImage(ImageSource.camera);
-                Uint8List finalFile = await compressImageToBelow2MB(file!);
-                setState(() {
-                  _file = finalFile;
-                });
+                Uint8List? file = await pickImage(
+                  ImageSource.camera,
+                );
+                if (file != null) {
+                  // setState(() {
+                  //   _isCompressing = true;  // Set compressing flag to true
+                  // });
+                  // Uint8List finalFile = await compressImage(file);
+                  setState(() {
+                    _file = file;
+                    // _isCompressing = false;  // Set compressing flag to false once done
+                  });
+                }
               },
             ),
 
-            const Divider(height: 1, thickness: 1), // Divider between options
+            const Divider(height: 1, thickness: 1),
 
             // Option: Choose a Photo
-            _buildDialogOption(
-              context,
-              label: "Choose a Photo",
-              icon: Icons.photo_library_outlined,
-              onTap: () async {
-                Navigator.pop(context);
-                Uint8List? file = await pickImage(ImageSource.gallery);
-                Uint8List finalFile2 = await compressImageToBelow2MB(file!);
-                setState(() {
-                  _file = finalFile2;
-                });
-              },
-            ),
+            _buildDialogOption(context,
+                label: "Choose a Photo",
+                icon: Icons.photo_library_outlined, onTap: () async {
+              Navigator.pop(context);
+              setState(() {
+                _isCompressing =
+                    true; // Show the loading indicator when picking image
+              });
+              Uint8List? file = await pickImage(ImageSource.gallery);
+              // if (file != null) {
+              // Delay to simulate processing (to show progress)
+              // setState(() {
+              //   _isCompressing = true;  // Start compression
+              // }
+              // );
+              // Uint8List finalFile2 = await compressImage(file);
+              setState(() {
+                _file = file;
+                _isCompressing = false; // Stop compression
+              });
+            }),
 
-            const Divider(height: 1, thickness: 1), // Divider before Cancel
+            const Divider(height: 1, thickness: 1),
 
             // Cancel Option
             _buildDialogOption(
@@ -197,7 +188,7 @@ class _AddPostState extends State<AddPost> {
           children: [
             Icon(icon,
                 size: 24, color: isCancel ? Colors.red : Colors.lightBlue[600]),
-            const SizedBox(width: 16), // Space between icon and text
+            const SizedBox(width: 16),
             Text(
               label,
               style: TextStyle(
@@ -233,7 +224,7 @@ class _AddPostState extends State<AddPost> {
   Widget build(BuildContext context) {
     final Userm? user =
         Provider.of<UserProvider>(context, listen: false).getUser;
-    //   print("############# USER :${user!.uid}");
+
     return _file == null
         ? Center(
             child: IconButton(
@@ -264,11 +255,7 @@ class _AddPostState extends State<AddPost> {
                           color: blueColor,
                           fontWeight: FontWeight.bold),
                     )),
-                IconButton(
-                    onPressed: () {
-                      logout();
-                    },
-                    icon: const Icon(Icons.logout))
+                
               ],
             ),
             body: Column(
@@ -278,11 +265,26 @@ class _AddPostState extends State<AddPost> {
                         color: blueColor,
                       )
                     : const Padding(padding: EdgeInsets.all(0)),
-                const Divider(),
+                // const Divider(),
+                _isCompressing
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : Image.memory(
+                        _file!,
+                        width: double.infinity,
+                        height: 500,
+                        fit: BoxFit.cover,
+                      ),
+
+                const Divider(
+                  thickness: 1.5,
+                ),
+                // SizedBox(height: ,),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const SizedBox(width: 5),
                     FutureBuilder<String>(
                       future: getImageUrl(
                           "pfp/${user!.uid}"), // Use future to get image URL
@@ -291,54 +293,40 @@ class _AddPostState extends State<AddPost> {
                             ConnectionState.waiting) {
                           return const Center(
                             child: CircularProgressIndicator(),
-                          ); // Show loading indicator while fetching
+                          );
                         }
 
                         if (snapshot.hasError) {
                           return const CircleAvatar(
                             radius: 30,
                             child: Icon(Icons.error),
-                          ); // Show error icon if there's an error
+                          );
                         }
 
-                        final imageUrL = snapshot.data!;
+                        final String imageUrl = snapshot.data!;
                         return CircleAvatar(
-                          backgroundImage: CachedNetworkImageProvider(imageUrL),
+                          backgroundImage: NetworkImage(imageUrl),
                           radius: 30,
                         );
                       },
                     ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      child: TextField(
-                        controller: _controller,
-                        maxLines: 5,
-                        decoration: const InputDecoration(
-                          hintText: "Add a Caption...",
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 45,
-                      width: 45,
-                      child: AspectRatio(
-                        aspectRatio: 487 / 451,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: MemoryImage(_file!),
-                                fit: BoxFit.fill,
-                                alignment: FractionalOffset.topCenter),
+                    const SizedBox(width: 5),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          controller: _controller,
+                          decoration: const InputDecoration(
+                            hintText: "Write a caption...",
+                            hintStyle: TextStyle(fontSize: 17),
+                            border: InputBorder.none,
                           ),
                         ),
                       ),
                     ),
-                    const Divider(),
                   ],
                 )
               ],
-            ),
-          );
+            ));
   }
 }
