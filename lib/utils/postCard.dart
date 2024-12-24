@@ -18,6 +18,7 @@ class PostsCard extends StatefulWidget {
 
 class _PostsCardState extends State<PostsCard>
     with SingleTickerProviderStateMixin {
+      
   bool _isLiked = false;
   bool _showHeart = false;
   late AnimationController _animationController;
@@ -26,6 +27,7 @@ class _PostsCardState extends State<PostsCard>
   @override
   void initState() {
     super.initState();
+    print("I HAVE ");
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
@@ -69,9 +71,12 @@ class _PostsCardState extends State<PostsCard>
   Widget build(BuildContext context) {
     final Userm? _user =
         Provider.of<UserProvider>(context, listen: false).getUser;
-    if (_user != null) {
-      print("USER uis : ${_user.uid}");
-    }
+    if (_user == null) {
+  return const Center(child: Text("am null"));
+}
+    // if (_user != null) {
+    //   print("USER uis : ${_user.uid}");
+    // }
     _isLiked = widget.snap['likes'].contains(_user!.uid);
     int commentCount = widget.snap['comments'].length;
     String getCommentText(int count) {

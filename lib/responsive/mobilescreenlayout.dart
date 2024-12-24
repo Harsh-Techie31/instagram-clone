@@ -7,8 +7,9 @@ import 'package:instagram_flutter/screens/OG_login_screen.dart';
 import 'package:instagram_flutter/screens/add-post.dart';
 import 'package:instagram_flutter/screens/explore.dart';
 import 'package:instagram_flutter/screens/feed_screen.dart';
+import 'package:instagram_flutter/screens/profile.dart';
 import 'package:instagram_flutter/utils/colors.dart';
-import 'package:instagram_flutter/utils/postCard.dart';
+// import 'package:instagram_flutter/utils/postCard.dart';
 import 'package:instagram_flutter/utils/utils.dart';
 // import 'package:provider/provider.dart';
 
@@ -20,20 +21,7 @@ class MobileScreenLayout extends StatefulWidget {
 }
 
 class _MobileScreenLayoutState extends State<MobileScreenLayout> {
-  void logout() async {
-    FirebaseAuth _authL = FirebaseAuth.instance;
-    try {
-      await _authL.signOut();
-      showSnackBar("Logged out Succesfully", context, Duration(seconds: 1));
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginScreenMobile()),
-      );
-    } catch (err) {
-      showSnackBar(err.toString(), context);
-    }
-  }
+  
 
   int _page = 0;
   late PageController pageController;
@@ -73,12 +61,13 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
         controller: pageController,
         onPageChanged: pageChanged,
         physics: const NeverScrollableScrollPhysics(),
-        children:  [
+        children:   [
           const FeedScreen(),
-          ExplorePage(),
-          const AddPost(),
-          const Text("notifcations"),
-          const Text("profile"),
+          const ExplorePage(),
+          const  AddPost(),
+          const  Text("notifcations"),
+           ProfilePage(uid : FirebaseAuth.instance.currentUser!.uid),
+          //  ProfilePage(uid : "QEM4NF8ByYbEbi8nhZwdjExxPLP2"),
         ],
       ),
       bottomNavigationBar: CupertinoTabBar(

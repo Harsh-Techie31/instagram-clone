@@ -43,7 +43,7 @@ class ExploreImages extends StatelessWidget {
             ),
             itemCount: images.length,
             itemBuilder: (context, index) {
-              return _buildGridTile(images[index]);
+              return buildGridTile(images[index]);
             },
           );
         },
@@ -52,7 +52,7 @@ class ExploreImages extends StatelessWidget {
   }
 }
 
-Widget _buildGridTile(String imageUrl) {
+Widget buildGridTile(String imageUrl) {
   return ClipRRect(
     // borderRadius: BorderRadius.circular(8), // Optional for rounded corners
     child: Image.network(

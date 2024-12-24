@@ -44,3 +44,4 @@ Future<Uint8List> networkImageToUint8List(String imageUrl) async {
     throw Exception('Error fetching image: $e');
   }
 }
+

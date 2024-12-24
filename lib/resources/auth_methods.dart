@@ -165,4 +165,32 @@ class AuthMethods {
 
   // return res; // Return the response
 }
+
+
+Future<void> followUser(String uid, String followid) async{
+  print("HEY AM CALLED #######################");
+  var snap = await FirebaseFirestore.instance.collection("users").doc(uid).get();
+
+  if(snap.data()!['following'].contains(followid)){
+    print("HEY AM UNFOLLOWING #######################");
+      await FirebaseFirestore.instance.collection("users").doc(uid).update({
+        "following" : FieldValue.arrayRemove([followid])
+      });
+
+      await FirebaseFirestore.instance.collection("users").doc(followid).update({
+        "followers" : FieldValue.arrayRemove([uid])
+      });
+
+  }else{
+    // print("HEY AM FOLLOWING#######################");
+    await FirebaseFirestore.instance.collection("users").doc(uid).update({
+        "following" : FieldValue.arrayUnion([followid])
+      });
+
+      await FirebaseFirestore.instance.collection("users").doc(followid).update({
+        "followers" : FieldValue.arrayUnion([uid])
+      });
+  }
+
+}
 }

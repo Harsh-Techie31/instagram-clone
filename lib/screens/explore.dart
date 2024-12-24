@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram_flutter/screens/profile.dart';
 import 'package:instagram_flutter/utils/colors.dart';
 import 'package:instagram_flutter/utils/explore_feed.dart';
 
@@ -73,13 +75,16 @@ class _ExplorePageState extends State<ExplorePage> {
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) {
               var user = snapshot.data!.docs[index];
-              return ListTile(
-                // leading: user['pfpUrl'] != null
-                //     ? CircleAvatar(
-                //         backgroundImage: CachedNetworkImageProvider(user['pfpUrl']),
-                //       )
-                //     : null,
-                title: Text(user['username']),
+              return InkWell(
+                onTap:()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ProfilePage(uid: user['uid']))),
+                child: ListTile(
+                  leading: user['pfpLink'] != null
+                      ? CircleAvatar(
+                          backgroundImage: CachedNetworkImageProvider(user['pfpLink']),
+                        )
+                      : null,
+                  title: Text(user['username']),
+                ),
               );
             },
           );
