@@ -36,7 +36,7 @@ class _ExplorePageState extends State<ExplorePage> {
               borderRadius: BorderRadius.circular(30),
             ),
             prefixIcon: const Icon(Icons.search),
-            hintText: "Search"),
+            hintText: "Search by Username"),
 
           onChanged: (value) {
             setState(() {

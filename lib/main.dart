@@ -24,6 +24,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  final UserProvider userProvider = UserProvider();
+  await userProvider.refreshUser();
   // debugPaintSizeEnabled : false;
   runApp(const MyApp());
 }

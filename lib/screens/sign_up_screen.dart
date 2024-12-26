@@ -191,102 +191,114 @@ Widget _buildDialogOption(BuildContext context,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(height: screenHeight * 0.08),
-                  Center(
-                    child: Stack(
-                      children: [
-                        CircleAvatar(
-                          radius: 64,
-                          backgroundImage: _profileImage != null
-                              ? MemoryImage(_profileImage!)
-                              : NetworkImage(_defaultImageUrl) as ImageProvider,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(height: screenHeight * 0.08),
+                Center(
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 64,
+                        backgroundImage: _profileImage != null
+                            ? MemoryImage(_profileImage!)
+                            : NetworkImage(_defaultImageUrl) as ImageProvider,
+                      ),
+                      Positioned(
+                        bottom: -5,
+                        left: 80,
+                        child: IconButton(
+                          onPressed: () => _selectImage(context),
+                          icon: const Icon(Icons.add_a_photo),
+                          color: Colors.black,
+                          iconSize: 30,
                         ),
-                        Positioned(
-                          bottom: -5,
-                          left: 80,
-                          child: IconButton(
-                            onPressed: () => _selectImage(context),
-                            icon: const Icon(Icons.add_a_photo),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: screenHeight * 0.08),
+                TextFieldInput(
+                  textEditingController: _idTextController,
+                  hintText: "Enter your Username",
+                  textInputType: TextInputType.text,
+                ),
+                const SizedBox(height: 10),
+                TextFieldInput(
+                  textEditingController: _emailTextController,
+                  hintText: "Enter your email",
+                  textInputType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 10),
+                TextFieldInput(
+                  textEditingController: _pwTextController,
+                  hintText: "Enter your password",
+                  textInputType: TextInputType.text,
+                  isPass: true,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _signUpUser,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: blueColor,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 11,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: _isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(color: primaryColor),
+                        )
+                      : const Text(
+                          "Sign Up",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                ),
+                const SizedBox(height: 10),
+                const Spacer(),
+                
+                const Divider(),
+                Center(
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginScreenMobile()),
+                      );
+                    },
+                    child: const Row(
+                      mainAxisAlignment:  MainAxisAlignment.center,
+                      children: [
+                         Text(
+                          "Already have an account?",
+                          style: TextStyle(
                             color: Colors.black,
-                            iconSize: 30,
+                            fontSize: 15,
+                          ),
+                        ),
+                         Text(
+                          " Log in",
+                          style: TextStyle(
+                            color: blueColor,
+                            fontSize: 17,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: screenHeight * 0.08),
-                  TextFieldInput(
-                    textEditingController: _idTextController,
-                    hintText: "Enter your Username",
-                    textInputType: TextInputType.text,
-                  ),
-                  const SizedBox(height: 10),
-                  TextFieldInput(
-                    textEditingController: _emailTextController,
-                    hintText: "Enter your email",
-                    textInputType: TextInputType.emailAddress,
-                  ),
-                  const SizedBox(height: 10),
-                  TextFieldInput(
-                    textEditingController: _pwTextController,
-                    hintText: "Enter your password",
-                    textInputType: TextInputType.text,
-                    isPass: true,
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _signUpUser,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: blueColor,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 11,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    child: _isLoading
-                        ? const Center(
-                            child: CircularProgressIndicator(color: primaryColor),
-                          )
-                        : const Text(
-                            "Sign Up",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Divider(),
-                  Center(
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const LoginScreenMobile()),
-                        );
-                      },
-                      child: const Text(
-                        "Already have an account? Log in.",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

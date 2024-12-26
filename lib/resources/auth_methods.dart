@@ -3,8 +3,10 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:instagram_flutter/models/post-models.dart';
 import 'package:instagram_flutter/models/user-models.dart';
+import 'package:instagram_flutter/utils/utils.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as sup;
 // import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -115,6 +117,20 @@ class AuthMethods {
       // print("REACHED BEFORE THE FIRESTORE CALL3333");
       res = err.toString();
     }
+    return res;
+  }
+
+  Future<String> deletePosts(String postid , String uid )async {
+    String res = "Some error occured";
+    try{
+      await _firestore.collection("posts").doc(postid).delete();
+      await sup.Supabase.instance.client.storage.from('user-images').remove(["post/$uid/$postid.jpeg"]);
+      res = "done";
+
+    }catch(ee){
+      res = ee.toString();
+    }
+
     return res;
   }
 

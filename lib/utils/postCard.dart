@@ -4,6 +4,7 @@ import 'package:instagram_flutter/providers/user-provider.dart';
 import 'package:instagram_flutter/resources/auth_methods.dart';
 import 'package:instagram_flutter/screens/comment-screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
+import 'package:instagram_flutter/utils/utils.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +19,6 @@ class PostsCard extends StatefulWidget {
 
 class _PostsCardState extends State<PostsCard>
     with SingleTickerProviderStateMixin {
-      
   bool _isLiked = false;
   bool _showHeart = false;
   late AnimationController _animationController;
@@ -27,7 +27,7 @@ class _PostsCardState extends State<PostsCard>
   @override
   void initState() {
     super.initState();
-    print("I HAVE ");
+    // print("I HAVE ");
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
@@ -67,17 +67,102 @@ class _PostsCardState extends State<PostsCard>
     // print("Leaving double tap");
   }
 
+  void deletePost(BuildContext context, String pId , String userId) {
+    showDialog(
+      context: context,
+      barrierDismissible: true, // Allows tapping outside to dismiss the dialog
+      builder: (BuildContext context) {
+        return Dialog(
+          // backgroundColor: Colors.transparent,
+          // surfaceTintColor: Colors.yellow,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          elevation: 5.0,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Delete Post",
+                  style: TextStyle(
+                    fontSize: 22.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 10.0),
+                const Text(
+                  "Are you sure you want to delete this post?",
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                const SizedBox(height: 10.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); // Close the dialog
+                      },
+                      child: const Text(
+                        "Cancel",
+                        style: TextStyle(
+                            color: Color.fromARGB(255, 215, 210, 210)),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) {
+                            return const Center(child: CircularProgressIndicator());
+                          },
+                        );
+                        String output = await AuthMethods().deletePosts(pId , userId);
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                        
+
+                        if (output == "done") {
+                          showSnackBar("Post Deleted!", context);
+                        } else {
+                          showSnackBar(output, context);
+                        }
+                        // Close the dialog
+                      },
+                      child: const Text(
+                        "Delete",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final Userm? _user =
         Provider.of<UserProvider>(context, listen: false).getUser;
     if (_user == null) {
-  return const Center(child: Text("am null"));
-}
+      // print("REACHED TILL HEREEEEEEEEEEEE2222222222222222222222222");
+      UserProvider _userProvider = Provider.of(context, listen: false);
+      // // print("REACHED TILL HEREEEEEEEEEEEE2222222222222222222222222");
+      _userProvider.refreshUser();
+
+      return const Center(child: CircularProgressIndicator());
+    }
     // if (_user != null) {
     //   print("USER uis : ${_user.uid}");
     // }
-    _isLiked = widget.snap['likes'].contains(_user!.uid);
+    _isLiked = widget.snap['likes'].contains(_user.uid);
     int commentCount = widget.snap['comments'].length;
     String getCommentText(int count) {
       switch (count) {
@@ -85,8 +170,8 @@ class _PostsCardState extends State<PostsCard>
           return "No comments yet";
         case 1:
           return "View 1 Comment";
-        default :
-        return "View all $count Comments";
+        default:
+          return "View all $count Comments";
       }
     }
 
@@ -122,7 +207,9 @@ class _PostsCardState extends State<PostsCard>
                 ),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  deletePost(context, widget.snap['postId'],widget.snap['uid']);
+                },
                 icon: const Icon(
                   Icons.more_vert,
                   size: 28,
